@@ -10,7 +10,7 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
 # Cargar el modelo entrenado
-model = joblib.load('model.pkl')
+model = joblib.load('model-iris.pkl')
 # model = joblib.load('modelo_svc.joblib')
 app.logger.debug('Modelo cargado correctamente.')
 
