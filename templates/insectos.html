@@ -2,13 +2,42 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
-    <title>Clasificador de Insectos</title>
+    <title>MY WORLD - Clasificador de Insectos</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'golour': ['"Rubik"', 'sans-serif'],
+                    },
+                    colors: {
+                        'golour-primary': '#3a86ff',
+                        'golour-secondary': '#8338ec',
+                        'golour-accent': '#ff006e',
+                    }
+                }
+            }
+        }
+    </script>
     <script>
         function clasificarInsecto(event) {
             event.preventDefault();
             const abdomen = document.getElementById('abdomen').value;
             const antena = document.getElementById('antena').value;
+
+            // Validación de campos vacíos
+            if(!abdomen || !antena) {
+                const resultado = document.getElementById('resultado');
+                resultado.textContent = 'Por favor completa todos los campos';
+                resultado.className = "text-golour-accent mt-4 font-medium animate-pulse";
+                return;
+            }
+
+            // Mostrar indicador de carga
+            const boton = document.querySelector('button[type="submit"]');
+            boton.innerHTML = '<svg class="animate-spin h-5 w-5 mx-auto text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
 
             fetch('/predict-insecto', {
                 method: 'POST',
@@ -22,41 +51,58 @@
                 const resultado = document.getElementById('resultado');
                 if (data.error) {
                     resultado.textContent = 'Error: ' + data.error;
-                    resultado.className = "text-red-600 mt-4";
+                    resultado.className = "text-golour-accent mt-4 font-medium";
                 } else {
-                    resultado.textContent = 'El insecto es un/a ' + data.categoria;
-                    resultado.className = "text-green-600 mt-4 font-semibold";
+                    resultado.innerHTML = `<span class="text-golour-primary"> Resultado:</span> El insecto es un/a <span class="font-bold text-golour-secondary">${data.categoria}</span>`;
+                    resultado.className = "mt-4 text-lg";
                 }
+                boton.textContent = 'Enviar';
             })
             .catch(error => {
                 const resultado = document.getElementById('resultado');
-                resultado.textContent = 'Error en la solicitud.';
-                resultado.className = "text-red-600 mt-4";
+                resultado.textContent = 'Error en la solicitud. Intenta nuevamente.';
+                resultado.className = "text-golour-accent mt-4 font-medium";
+                boton.textContent = 'Enviar';
                 console.error('Error:', error);
             });
         }
     </script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h1 class="text-2xl font-bold mb-6 text-center">Clasificador de Insectos</h1>
-        <form id="formulario" onsubmit="clasificarInsecto(event)" class="space-y-4">
-            <div>
-                <label for="abdomen" class="block text-gray-700 mb-1">Longitud del Abdomen:</label>
-                <input type="text" id="abdomen" name="abdomen" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900 font-golour flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md border-2 border-golour-primary/20 relative overflow-hidden">
+        <!-- Decoración temática -->
+        <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-golour-secondary/10"></div>
+        <div class="absolute -bottom-5 -left-5 w-20 h-20 rounded-full bg-golour-accent/10"></div>
+        
+        <div class="relative z-10">
+            <h1 class="text-3xl font-bold mb-2 text-center bg-gradient-to-r from-golour-primary to-golour-secondary bg-clip-text text-transparent">
+                MY WORLD
+            </h1>
+            <p class="text-center text-sm text-gray-500 mb-6">Clasificador de Insectos</p>
+            
+            <form id="formulario" onsubmit="clasificarInsecto(event)" class="space-y-4">
+                <div>
+                    <label for="abdomen" class="block text-sm font-medium text-gray-700 mb-1">Longitud del Abdomen (mm):</label>
+                    <input type="number" step="0.1" id="abdomen" name="abdomen" required placeholder="Ej: 2.7"
+                        class="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-golour-primary focus:border-transparent transition placeholder-gray-400" />
+                </div>
+                <div>
+                    <label for="antena" class="block text-sm font-medium text-gray-700 mb-1">Longitud de Antenas (mm):</label>
+                    <input type="number" step="0.1" id="antena" name="antena" required placeholder="Ej: 5.5"
+                        class="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-golour-primary focus:border-transparent transition placeholder-gray-400" />
+                </div>
+                <button type="submit"
+                    class="w-full bg-gradient-to-r from-golour-primary to-golour-secondary text-white py-3 rounded-lg hover:opacity-90 transition-all duration-200 font-medium shadow-md">
+                    Clasificar Insecto
+                </button>
+            </form>
+            <p id="resultado" class="mt-4 text-center"></p>
+            
+            <div class="mt-6 pt-4 border-t border-gray-200 text-xs text-gray-500 text-center">
+                <p>Sistema de clasificación entomológica</p>
+                <p class="mt-1">© MY WORLD - Golour</p>
             </div>
-            <div>
-                <label for="antena" class="block text-gray-700 mb-1">Longitud de las Antenas:</label>
-                <input type="text" id="antena" name="antena" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
-            </div>
-            <button type="submit"
-                class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors duration-200">
-                Enviar
-            </button>
-        </form>
-        <p id="resultado" class="mt-4 text-center"></p>
+        </div>
     </div>
 </body>
 </html>
